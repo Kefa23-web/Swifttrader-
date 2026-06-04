@@ -169,6 +169,85 @@ td{font-size:12px;padding:8px 0;border-top:1px solid rgba(255,255,255,0.04);}
 .price-flash{animation:flash 0.3s ease;}
 @keyframes flash{0%,100%{opacity:1;}50%{opacity:0.5;}}
 
+
+/* ── MOBILE RESPONSIVE ─────────────────────── */
+@media(max-width:768px){
+  nav { padding: 0 12px; }
+  .nav-links { display: none; }
+  .nav-logo { font-size: 16px; }
+  .nav-logo-icon { width: 30px; height: 30px; font-size: 15px; }
+  .nav-right { gap: 6px; }
+  .btn-outline, .btn-primary { padding: 6px 12px; font-size: 12px; }
+  #balanceDisplay { font-size: 11px !important; }
+
+  .main { grid-template-columns: 1fr !important; padding-top: 0; }
+  .sidebar, .right-panel { display: none !important; }
+  .center { padding: 10px; }
+
+  /* Mobile bottom nav */
+  .mobile-nav {
+    display: flex !important;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(10,22,40,0.98);
+    border-top: 1px solid var(--border);
+    z-index: 200;
+    padding: 8px 0 12px;
+  }
+  .mobile-nav-item {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; gap: 3px;
+    font-size: 10px; color: var(--text-dim);
+    cursor: pointer; padding: 4px;
+  }
+  .mobile-nav-item.active { color: var(--blue-glow); }
+  .mobile-nav-item .mn-icon { font-size: 20px; }
+
+  /* Mobile AI panel */
+  .mobile-ai {
+    display: block !important;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 80px;
+  }
+
+  .stats-row { grid-template-columns: repeat(3,1fr); gap: 8px; }
+  .stat-card { padding: 10px 8px; }
+  .stat-val { font-size: 16px; }
+  .stat-label { font-size: 10px; }
+
+  .chart-card { padding: 14px; }
+  .asset-name { font-size: 14px; }
+  .asset-price { font-size: 18px; }
+  .chart-tabs { gap: 2px; }
+  .chart-tab { padding: 4px 8px; font-size: 11px; }
+
+  .trade-panel { padding: 14px; }
+  .trade-types { grid-template-columns: repeat(3,1fr); gap: 6px; }
+  .trade-type { padding: 8px 4px; font-size: 11px; }
+  .trade-type .emoji { font-size: 16px; }
+  .btn-rise, .btn-fall { padding: 14px; font-size: 16px; }
+
+  .positions-card { margin-bottom: 8px; }
+  table { font-size: 11px; }
+
+  .ticker {
+    padding: 6px 12px;
+    gap: 16px;
+    font-size: 11px;
+  }
+  .ticker-price { font-size: 12px; }
+
+  /* center content needs bottom padding for mobile nav */
+  .center { padding-bottom: 80px; }
+}
+@media(min-width:769px){
+  .mobile-nav { display: none !important; }
+  .mobile-ai { display: none !important; }
+}
+
 /* SCROLLBAR */
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
@@ -190,16 +269,16 @@ td{font-size:12px;padding:8px 0;border-top:1px solid rgba(255,255,255,0.04);}
     <div class="nav-logo-icon">⚡</div>
     Swifttrader
   </div>
-  <div class="nav-links">
+  <div class="nav-links" id="navLinks">
     <div class="nav-link active">Trade</div>
     <div class="nav-link">Markets</div>
     <div class="nav-link">Portfolio</div>
-    <div class="nav-link">AI Analysis</div>
+    <div class="nav-link">AI</div>
   </div>
-  <div class="nav-right">
-    <div style="font-size:13px;color:var(--text-dim);">Balance: <span style="color:var(--green);font-weight:700;">$1,250.00</span></div>
-    <button class="btn-outline" onclick="showLogin()">Log in</button>
-    <button class="btn-primary" onclick="showSignup()">Sign up</button>
+  <div class="nav-right" id="navRight">
+    <div id="balanceDisplay" style="font-size:13px;color:var(--text-dim);display:none;">Balance: <span id="liveBalance" style="color:var(--green);font-weight:700;">--</span></div>
+    <button class="btn-outline" id="loginBtn" onclick="showLogin()">Log in</button>
+    <button class="btn-primary" id="signupBtn" onclick="showSignup()">Sign up</button>
   </div>
 </nav>
 
@@ -432,6 +511,60 @@ td{font-size:12px;padding:8px 0;border-top:1px solid rgba(255,255,255,0.04);}
   </div>
 </div>
 
+<!-- MOBILE BOTTOM NAV -->
+<div class="mobile-nav" style="display:none;">
+  <div class="mobile-nav-item active" onclick="mobileNav(this,'trade')">
+    <span class="mn-icon">📈</span>Trade
+  </div>
+  <div class="mobile-nav-item" onclick="mobileNav(this,'markets')">
+    <span class="mn-icon">🌍</span>Markets
+  </div>
+  <div class="mobile-nav-item" onclick="mobileNav(this,'ai')">
+    <span class="mn-icon">🤖</span>AI
+  </div>
+  <div class="mobile-nav-item" onclick="mobileNav(this,'account')">
+    <span class="mn-icon">👤</span>Account
+  </div>
+</div>
+
+<!-- MOBILE AI PANEL -->
+<div class="mobile-ai" id="mobileAI" style="display:none;margin:0 10px;">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+    <span style="background:linear-gradient(135deg,var(--blue-accent),var(--cyan));padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;">✦ AI</span>
+    <span style="font-family:Syne,sans-serif;font-size:16px;font-weight:700;">Market Analysis</span>
+  </div>
+  <!-- Sentiment -->
+  <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px;margin-bottom:12px;">
+    <div style="font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:10px;">🧠 MARKET SENTIMENT</div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px;"><span>Bullish</span><span style="color:var(--green);font-weight:700;">68%</span></div>
+    <div style="height:6px;background:rgba(255,255,255,0.08);border-radius:3px;margin-bottom:8px;"><div style="width:68%;height:100%;background:linear-gradient(90deg,#059669,#10b981);border-radius:3px;"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px;"><span>Bearish</span><span style="color:var(--red);font-weight:700;">22%</span></div>
+    <div style="height:6px;background:rgba(255,255,255,0.08);border-radius:3px;margin-bottom:8px;"><div style="width:22%;height:100%;background:linear-gradient(90deg,#dc2626,#ef4444);border-radius:3px;"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px;"><span>Neutral</span><span style="color:var(--gold);font-weight:700;">10%</span></div>
+    <div style="height:6px;background:rgba(255,255,255,0.08);border-radius:3px;"><div style="width:10%;height:100%;background:linear-gradient(90deg,#d97706,#f59e0b);border-radius:3px;"></div></div>
+  </div>
+  <!-- Signals -->
+  <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px;margin-bottom:12px;">
+    <div style="font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:10px;">⚡ AI SIGNALS</div>
+    <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;"><span>V100 (1s)</span><span style="background:rgba(16,185,129,0.15);color:var(--green);padding:2px 10px;border-radius:20px;font-weight:700;font-size:11px;">BUY 92%</span></div>
+    <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;"><span>V75</span><span style="background:rgba(16,185,129,0.15);color:var(--green);padding:2px 10px;border-radius:20px;font-weight:700;font-size:11px;">BUY 87%</span></div>
+    <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;"><span>V50</span><span style="background:rgba(239,68,68,0.15);color:var(--red);padding:2px 10px;border-radius:20px;font-weight:700;font-size:11px;">SELL 74%</span></div>
+    <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;"><span>Boom 500</span><span style="background:rgba(16,185,129,0.15);color:var(--green);padding:2px 10px;border-radius:20px;font-weight:700;font-size:11px;">BUY 81%</span></div>
+    <div style="display:flex;justify-content:space-between;padding:7px 0;font-size:13px;"><span>Crash 500</span><span style="background:rgba(245,158,11,0.15);color:var(--gold);padding:2px 10px;border-radius:20px;font-weight:700;font-size:11px;">HOLD 61%</span></div>
+  </div>
+  <!-- AI Chat -->
+  <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:14px;">
+    <div style="font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:10px;">💬 ASK AI ANALYST</div>
+    <div id="mobileChatMessages" style="max-height:150px;overflow-y:auto;margin-bottom:10px;">
+      <div style="font-size:13px;line-height:1.6;color:var(--text-dim);background:rgba(26,86,219,0.08);border-radius:8px;padding:10px;">👋 Ask me anything about markets!</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <input id="mobileChatInput" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;" placeholder="Ask about markets..." onkeypress="if(event.key==='Enter')sendMobileChat()"/>
+      <button onclick="sendMobileChat()" style="padding:8px 14px;border:none;border-radius:8px;background:var(--blue-accent);color:#fff;font-size:13px;cursor:pointer;">→</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast" style="position:fixed;bottom:24px;right:24px;background:var(--blue-accent);color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;display:none;z-index:200;animation:fadeIn 0.3s ease;"></div>
 
@@ -515,17 +648,19 @@ function showToast(msg){
   setTimeout(()=>t.style.display='none',3000);
 }
 
-// AUTH MODALS
 // ── DERIV CONFIG ──────────────────────────────
-const DERIV_APP_ID = '33rZaaN5XdyBlUqYsUEom';
+const DERIV_APP_ID = 36300; // Public demo app ID for WebSocket (works for all users)
+const MY_APP_ID = '33rZaaN5XdyBlUqYsUEom'; // Your registered OAuth app
 const AFFILIATE_TOKEN = '5RJ2XVPXKKW7';
-const REDIRECT_URI = encodeURIComponent(window.location.origin + window.location.pathname);
+const SITE_URL = 'https://swifttrader-k9c9.vercel.app/';
 
 function showLogin(){
-  window.location.href = `https://oauth.deriv.com/oauth2/authorize?app_id=${DERIV_APP_ID}&redirect_uri=${REDIRECT_URI}&affiliate_token=${AFFILIATE_TOKEN}`;
+  // Uses legacy OAuth - works with any user's Deriv account
+  window.location.href = 'https://oauth.deriv.com/oauth2/authorize?app_id=36300&redirect_uri=' + encodeURIComponent(SITE_URL) + '&affiliate_token=' + AFFILIATE_TOKEN;
 }
 function showSignup(){
-  window.location.href = `https://oauth.deriv.com/oauth2/authorize?app_id=${DERIV_APP_ID}&redirect_uri=${REDIRECT_URI}&affiliate_token=${AFFILIATE_TOKEN}&action=signup`;
+  // Signup with affiliate token so you earn commission
+  window.location.href = 'https://deriv.com/signup/?affiliate_token=' + AFFILIATE_TOKEN + '&utm_campaign=myaffiliates';
 }
 
 // ── HANDLE OAUTH CALLBACK ─────────────────────
@@ -546,16 +681,15 @@ function handleOAuthCallback(){
 }
 
 function loadUserSession(token, acct, cur){
-  // Update navbar
-  const navRight = document.querySelector('.nav-right');
-  navRight.innerHTML = `
-    <div style="font-size:13px;color:var(--text-dim);">
-      <span style="color:var(--text-dim);font-size:12px;">${acct||'Account'}</span>
-    </div>
-    <div style="font-size:13px;color:var(--text-dim);">Balance: <span id="liveBalance" style="color:var(--green);font-weight:700;">Loading...</span></div>
-    <button class="btn-outline" onclick="logout()">Log out</button>
-  `;
-  showToast('✅ Logged in successfully!');
+  // Update navbar — hide login/signup, show balance + logout
+  const loginBtn = document.getElementById('loginBtn');
+  const signupBtn = document.getElementById('signupBtn');
+  const balDisplay = document.getElementById('balanceDisplay');
+  if(loginBtn) loginBtn.style.display = 'none';
+  if(signupBtn) signupBtn.innerHTML = '🔓 ' + (acct||'Account');
+  if(signupBtn) signupBtn.onclick = logout;
+  if(balDisplay) balDisplay.style.display = 'block';
+  showToast('✅ Logged in as ' + (acct||'User'));
   // Connect WebSocket to get real balance
   connectDerivWS(token);
 }
@@ -569,7 +703,7 @@ function logout(){
 // ── DERIV WEBSOCKET ───────────────────────────
 let ws;
 function connectDerivWS(token){
-  ws = new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=' + DERIV_APP_ID);
+  ws = new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=' + DERIV_APP_ID); // DERIV_APP_ID=36300
   ws.onopen = () => {
     // Authorize
     ws.send(JSON.stringify({authorize: token}));
@@ -691,6 +825,44 @@ document.querySelectorAll('.sidebar-item').forEach(item=>{
   });
 });
 
+// MOBILE NAV
+function mobileNav(el, tab){
+  document.querySelectorAll('.mobile-nav-item').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+  const center = document.querySelector('.center');
+  const mobileAI = document.getElementById('mobileAI');
+  if(tab === 'ai'){
+    center.style.display = 'none';
+    mobileAI.style.display = 'block';
+  } else if(tab === 'account'){
+    center.style.display = 'none';
+    mobileAI.style.display = 'none';
+    showToast(sessionStorage.getItem('deriv_token') ? '👤 Account: ' + (sessionStorage.getItem('deriv_acct')||'Logged in') : '⚠️ Please log in first');
+  } else {
+    center.style.display = 'block';
+    mobileAI.style.display = 'none';
+  }
+}
+
+// MOBILE CHAT
+function sendMobileChat(){
+  const input = document.getElementById('mobileChatInput');
+  const msg = input.value.trim();
+  if(!msg) return;
+  const chat = document.getElementById('mobileChatMessages');
+  chat.innerHTML += `<div style="font-size:13px;background:rgba(26,86,219,0.15);border-radius:8px;padding:8px;margin-bottom:6px;text-align:right;">${msg}</div>`;
+  input.value = '';
+  chat.scrollTop = chat.scrollHeight;
+  setTimeout(()=>{
+    const resp = aiResponses[aiIdx % aiResponses.length]; aiIdx++;
+    chat.innerHTML += `<div style="font-size:13px;color:var(--text-dim);background:rgba(26,86,219,0.08);border-radius:8px;padding:8px;margin-bottom:6px;">${resp}</div>`;
+    chat.scrollTop = chat.scrollHeight;
+  }, 1500);
+}
+
+// UPDATE loadUserSession to show balance in nav
+const _origLoadSession = loadUserSession;
+
 // CHART TABS
 document.querySelectorAll('.chart-tab').forEach(tab=>{
   tab.addEventListener('click',function(){
@@ -701,4 +873,3 @@ document.querySelectorAll('.chart-tab').forEach(tab=>{
 </script>
 </body>
 </html>
-
