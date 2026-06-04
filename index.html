@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Swifttrader — Professional Trading Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --blue-deep: #0a1628;
+  --blue-mid: #0d2144;
+  --blue-accent: #1a56db;
+  --blue-bright: #3b82f6;
+  --blue-glow: #60a5fa;
+  --cyan: #06b6d4;
+  --green: #10b981;
+  --red: #ef4444;
+  --gold: #f59e0b;
+  --text: #f0f6ff;
+  --text-dim: #94a3b8;
+  --border: rgba(59,130,246,0.18);
+  --card: rgba(13,33,68,0.7);
+  --glass: rgba(26,86,219,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--blue-deep);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 20% 20%, rgba(26,86,219,0.15) 0%, transparent 60%),radial-gradient(ellipse at 80% 80%, rgba(6,182,212,0.1) 0%, transparent 60%);pointer-events:none;z-index:0;}
+
+/* NAVBAR */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,22,40,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);}
+.nav-logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--blue-accent),var(--cyan));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.nav-links{display:flex;gap:4px;align-items:center;}
+.nav-link{padding:8px 14px;border-radius:8px;color:var(--text-dim);font-size:14px;cursor:pointer;transition:all 0.2s;}
+.nav-link:hover,.nav-link.active{background:var(--glass);color:var(--text);}
+.nav-right{display:flex;gap:8px;align-items:center;}
+.btn-outline{padding:8px 18px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text);font-size:14px;cursor:pointer;transition:all 0.2s;}
+.btn-outline:hover{border-color:var(--blue-bright);color:var(--blue-glow);}
+.btn-primary{padding:8px 18px;border:none;border-radius:8px;background:linear-gradient(135deg,var(--blue-accent),var(--blue-bright));color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.btn-primary:hover{opacity:0.9;transform:translateY(-1px);}
+
+/* MAIN LAYOUT */
+.main{padding-top:64px;display:grid;grid-template-columns:220px 1fr 320px;min-height:100vh;position:relative;z-index:1;}
+
+/* SIDEBAR */
+.sidebar{border-right:1px solid var(--border);padding:20px 12px;background:rgba(10,22,40,0.6);}
+.sidebar-section{margin-bottom:24px;}
+.sidebar-label{font-size:11px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;padding:0 8px;margin-bottom:8px;}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:all 0.2s;font-size:14px;color:var(--text-dim);}
+.sidebar-item:hover{background:var(--glass);color:var(--text);}
+.sidebar-item.active{background:rgba(26,86,219,0.2);color:var(--blue-glow);border-left:2px solid var(--blue-bright);}
+.sidebar-item .icon{font-size:16px;width:20px;text-align:center;}
+.market-item{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:8px;cursor:pointer;transition:all 0.2s;}
+.market-item:hover{background:var(--glass);}
+.market-name{font-size:13px;font-weight:500;}
+.market-change{font-size:12px;font-weight:600;}
+.up{color:var(--green);}
+.down{color:var(--red);}
+
+/* CENTER CONTENT */
+.center{padding:20px;overflow-y:auto;}
+
+/* CHART AREA */
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:20px;backdrop-filter:blur(10px);}
+.chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.chart-title{display:flex;align-items:center;gap:12px;}
+.asset-name{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;}
+.asset-price{font-size:24px;font-weight:700;color:var(--green);}
+.price-change{font-size:13px;color:var(--green);background:rgba(16,185,129,0.1);padding:3px 8px;border-radius:20px;}
+.chart-tabs{display:flex;gap:4px;}
+.chart-tab{padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;color:var(--text-dim);transition:all 0.2s;}
+.chart-tab.active{background:var(--blue-accent);color:#fff;}
+.chart-svg{width:100%;height:180px;}
+
+/* TRADE PANEL */
+.trade-panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:20px;}
+.trade-types{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.trade-type{padding:10px;border-radius:10px;border:1px solid var(--border);text-align:center;cursor:pointer;transition:all 0.2s;font-size:12px;font-weight:600;}
+.trade-type:hover{border-color:var(--blue-bright);}
+.trade-type.active{background:rgba(26,86,219,0.2);border-color:var(--blue-bright);color:var(--blue-glow);}
+.trade-type .emoji{font-size:18px;display:block;margin-bottom:4px;}
+.input-group{margin-bottom:12px;}
+.input-label{font-size:12px;color:var(--text-dim);margin-bottom:6px;}
+.input-row{display:flex;gap:8px;}
+.trade-input{flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;outline:none;transition:all 0.2s;}
+.trade-input:focus{border-color:var(--blue-bright);}
+.duration-btns{display:flex;gap:4px;}
+.dur-btn{padding:8px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-size:12px;cursor:pointer;transition:all 0.2s;}
+.dur-btn.active,.dur-btn:hover{background:var(--blue-accent);color:#fff;border-color:var(--blue-accent);}
+.payout-row{display:flex;justify-content:space-between;align-items:center;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:10px 14px;margin-bottom:14px;}
+.payout-label{font-size:12px;color:var(--text-dim);}
+.payout-val{font-size:16px;font-weight:700;color:var(--green);}
+.trade-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.btn-rise{padding:14px;border:none;border-radius:10px;background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.btn-fall{padding:14px;border:none;border-radius:10px;background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.btn-rise:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(16,185,129,0.4);}
+.btn-fall:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(239,68,68,0.4);}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;}
+.stat-val{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:2px;}
+.stat-label{font-size:11px;color:var(--text-dim);}
+
+/* RIGHT PANEL — AI */
+.right-panel{border-left:1px solid var(--border);padding:20px;background:rgba(10,22,40,0.6);overflow-y:auto;}
+.ai-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.ai-badge{background:linear-gradient(135deg,var(--blue-accent),var(--cyan));padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:0.5px;}
+.ai-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;}
+.ai-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;backdrop-filter:blur(10px);}
+.ai-card-title{font-size:12px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.signal-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+.signal-row:last-child{border-bottom:none;}
+.signal-asset{font-size:13px;font-weight:500;}
+.signal-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.signal-buy{background:rgba(16,185,129,0.15);color:var(--green);}
+.signal-sell{background:rgba(239,68,68,0.15);color:var(--red);}
+.signal-neutral{background:rgba(245,158,11,0.15);color:var(--gold);}
+.signal-conf{font-size:12px;color:var(--text-dim);}
+.meter-row{margin-bottom:10px;}
+.meter-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;}
+.meter-bar{height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;}
+.meter-fill{height:100%;border-radius:3px;transition:width 1s ease;}
+.sentiment-ring{display:flex;justify-content:center;align-items:center;padding:16px 0;}
+.ring-wrap{position:relative;width:100px;height:100px;}
+.ring-svg{transform:rotate(-90deg);}
+.ring-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+.ring-pct{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--green);}
+.ring-lbl{font-size:10px;color:var(--text-dim);}
+.ai-chat-input{display:flex;gap:8px;margin-top:12px;}
+.ai-input{flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;}
+.ai-input:focus{border-color:var(--blue-bright);}
+.ai-send{padding:8px 14px;border:none;border-radius:8px;background:var(--blue-accent);color:#fff;font-size:13px;cursor:pointer;}
+.ai-msg{font-size:13px;line-height:1.6;color:var(--text-dim);background:rgba(26,86,219,0.08);border-radius:8px;padding:10px 12px;margin-bottom:8px;}
+.ai-msg.user{background:rgba(26,86,219,0.15);color:var(--text);text-align:right;}
+.thinking{display:flex;gap:4px;align-items:center;padding:8px 12px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--blue-bright);animation:bounce 1.2s infinite;}
+.dot:nth-child(2){animation-delay:0.2s;}
+.dot:nth-child(3){animation-delay:0.4s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);}}
+
+/* POSITIONS TABLE */
+.positions-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;}
+.positions-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.pos-title{font-size:14px;font-weight:600;}
+.pos-live{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--green);}
+.pos-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+table{width:100%;border-collapse:collapse;}
+th{font-size:11px;color:var(--text-dim);text-align:left;padding:6px 0;font-weight:500;}
+td{font-size:12px;padding:8px 0;border-top:1px solid rgba(255,255,255,0.04);}
+
+/* PRICE TICKER */
+.ticker{background:rgba(13,33,68,0.8);border-bottom:1px solid var(--border);padding:8px 24px;display:flex;gap:32px;overflow-x:auto;position:fixed;top:64px;left:0;right:0;z-index:99;}
+.ticker-item{display:flex;align-items:center;gap:8px;white-space:nowrap;}
+.ticker-name{font-size:12px;font-weight:600;color:var(--text-dim);}
+.ticker-price{font-size:13px;font-weight:700;}
+.ticker-chg{font-size:11px;font-weight:600;}
+
+/* TABS */
+.tabs{display:flex;gap:4px;margin-bottom:16px;background:rgba(255,255,255,0.04);padding:4px;border-radius:10px;}
+.tab{flex:1;padding:8px;border-radius:8px;text-align:center;font-size:13px;cursor:pointer;color:var(--text-dim);transition:all 0.2s;}
+.tab.active{background:var(--blue-accent);color:#fff;font-weight:600;}
+
+/* ANIMATIONS */
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.fade-in{animation:fadeIn 0.4s ease forwards;}
+@keyframes shimmer{0%{background-position:-200% 0;}100%{background-position:200% 0;}}
+.price-flash{animation:flash 0.3s ease;}
+@keyframes flash{0%,100%{opacity:1;}50%{opacity:0.5;}}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .main{grid-template-columns:1fr;}
+  .sidebar,.right-panel{display:none;}
+  .ticker{gap:20px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-icon">⚡</div>
+    Swifttrader
+  </div>
+  <div class="nav-links">
+    <div class="nav-link active">Trade</div>
+    <div class="nav-link">Markets</div>
+    <div class="nav-link">Portfolio</div>
+    <div class="nav-link">AI Analysis</div>
+  </div>
+  <div class="nav-right">
+    <div style="font-size:13px;color:var(--text-dim);">Balance: <span style="color:var(--green);font-weight:700;">$1,250.00</span></div>
+    <button class="btn-outline" onclick="showLogin()">Log in</button>
+    <button class="btn-primary" onclick="showSignup()">Sign up</button>
+  </div>
+</nav>
+
+<!-- PRICE TICKER -->
+<div class="ticker" id="ticker">
+  <div class="ticker-item"><span class="ticker-name">V10</span><span class="ticker-price up" id="t1">977.45</span><span class="ticker-chg up">+0.12%</span></div>
+  <div class="ticker-item"><span class="ticker-name">V25</span><span class="ticker-price up" id="t2">1,842.30</span><span class="ticker-chg up">+0.08%</span></div>
+  <div class="ticker-item"><span class="ticker-name">V50</span><span class="ticker-price down" id="t3">4,521.80</span><span class="ticker-chg down">-0.23%</span></div>
+  <div class="ticker-item"><span class="ticker-name">V75</span><span class="ticker-price up" id="t4">6,204.15</span><span class="ticker-chg up">+0.31%</span></div>
+  <div class="ticker-item"><span class="ticker-name">V100</span><span class="ticker-price down" id="t5">9,887.60</span><span class="ticker-chg down">-0.15%</span></div>
+  <div class="ticker-item"><span class="ticker-name">BOOM500</span><span class="ticker-price up" id="t6">2,341.90</span><span class="ticker-chg up">+0.44%</span></div>
+  <div class="ticker-item"><span class="ticker-name">CRASH500</span><span class="ticker-price down" id="t7">1,129.75</span><span class="ticker-chg down">-0.38%</span></div>
+  <div class="ticker-item"><span class="ticker-name">STEP100</span><span class="ticker-price up" id="t8">8,802.20</span><span class="ticker-chg up">+0.07%</span></div>
+</div>
+
+<!-- MAIN -->
+<div class="main" style="margin-top:40px;">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Trade Types</div>
+      <div class="sidebar-item active"><span class="icon">📈</span>Rise/Fall</div>
+      <div class="sidebar-item"><span class="icon">🎯</span>Digits</div>
+      <div class="sidebar-item"><span class="icon">⚡</span>Accumulators</div>
+      <div class="sidebar-item"><span class="icon">💥</span>Multipliers</div>
+      <div class="sidebar-item"><span class="icon">🔼</span>Touch/No Touch</div>
+      <div class="sidebar-item"><span class="icon">📊</span>Higher/Lower</div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Markets</div>
+      <div class="market-item"><span class="market-name">Volatility 10</span><span class="market-change up">+0.12%</span></div>
+      <div class="market-item"><span class="market-name">Volatility 25</span><span class="market-change up">+0.08%</span></div>
+      <div class="market-item"><span class="market-name">Volatility 50</span><span class="market-change down">-0.23%</span></div>
+      <div class="market-item"><span class="market-name">Volatility 75</span><span class="market-change up">+0.31%</span></div>
+      <div class="market-item"><span class="market-name">Volatility 100</span><span class="market-change down">-0.15%</span></div>
+      <div class="market-item"><span class="market-name">Boom 500</span><span class="market-change up">+0.44%</span></div>
+      <div class="market-item"><span class="market-name">Crash 500</span><span class="market-change down">-0.38%</span></div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Account</div>
+      <div class="sidebar-item"><span class="icon">💼</span>Portfolio</div>
+      <div class="sidebar-item"><span class="icon">📋</span>History</div>
+      <div class="sidebar-item"><span class="icon">💳</span>Deposit</div>
+      <div class="sidebar-item"><span class="icon">⚙️</span>Settings</div>
+    </div>
+  </div>
+
+  <!-- CENTER -->
+  <div class="center">
+
+    <!-- STATS -->
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-val up">$3,240</div>
+        <div class="stat-label">Total Profit</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" style="color:var(--blue-glow);">68%</div>
+        <div class="stat-label">Win Rate</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" style="color:var(--gold);">142</div>
+        <div class="stat-label">Total Trades</div>
+      </div>
+    </div>
+
+    <!-- CHART -->
+    <div class="chart-card fade-in">
+      <div class="chart-header">
+        <div class="chart-title">
+          <div>
+            <div class="asset-name">Volatility 100 (1s) Index</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+              <span class="asset-price" id="livePrice">9,887.60</span>
+              <span class="price-change">▲ +0.31%</span>
+            </div>
+          </div>
+        </div>
+        <div class="chart-tabs">
+          <div class="chart-tab active">1m</div>
+          <div class="chart-tab">5m</div>
+          <div class="chart-tab">15m</div>
+          <div class="chart-tab">1H</div>
+          <div class="chart-tab">1D</div>
+        </div>
+      </div>
+      <svg class="chart-svg" id="chartSvg" viewBox="0 0 800 180" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path id="chartArea" fill="url(#chartFill)"/>
+        <path id="chartLine" fill="none" stroke="#3b82f6" stroke-width="2"/>
+        <line id="crosshair" x1="0" y1="0" x2="0" y2="180" stroke="rgba(255,255,255,0.2)" stroke-width="1" stroke-dasharray="4"/>
+      </svg>
+    </div>
+
+    <!-- TRADE PANEL -->
+    <div class="trade-panel fade-in">
+      <div class="tabs">
+        <div class="tab active">Rise / Fall</div>
+        <div class="tab">Higher / Lower</div>
+        <div class="tab">Touch</div>
+        <div class="tab">Digits</div>
+      </div>
+      <div class="trade-types">
+        <div class="trade-type active"><span class="emoji">📈</span>Rise/Fall</div>
+        <div class="trade-type"><span class="emoji">⬆️</span>Higher</div>
+        <div class="trade-type"><span class="emoji">⬇️</span>Lower</div>
+      </div>
+      <div class="input-group">
+        <div class="input-label">Stake (USD)</div>
+        <input class="trade-input" type="number" value="10" id="stakeInput" oninput="updatePayout()"/>
+      </div>
+      <div class="input-group">
+        <div class="input-label">Duration</div>
+        <div class="duration-btns">
+          <button class="dur-btn active" onclick="setDur(this,'1t')">1 Tick</button>
+          <button class="dur-btn" onclick="setDur(this,'5t')">5 Ticks</button>
+          <button class="dur-btn" onclick="setDur(this,'1m')">1 Min</button>
+          <button class="dur-btn" onclick="setDur(this,'5m')">5 Min</button>
+          <button class="dur-btn" onclick="setDur(this,'1h')">1 Hour</button>
+        </div>
+      </div>
+      <div class="payout-row">
+        <div><div class="payout-label">Potential Payout</div><div class="payout-val" id="payoutVal">$19.50</div></div>
+        <div style="text-align:right"><div class="payout-label">Profit</div><div class="payout-val" id="profitVal">+$9.50</div></div>
+        <div style="text-align:right"><div class="payout-label">Payout %</div><div class="payout-val">95%</div></div>
+      </div>
+      <div class="trade-btns">
+        <button class="btn-rise" onclick="placeTrade('rise')">▲ RISE</button>
+        <button class="btn-fall" onclick="placeTrade('fall')">▼ FALL</button>
+      </div>
+    </div>
+
+    <!-- OPEN POSITIONS -->
+    <div class="positions-card fade-in">
+      <div class="positions-header">
+        <div class="pos-title">Open Positions</div>
+        <div class="pos-live"><div class="pos-dot"></div>Live</div>
+      </div>
+      <table>
+        <thead><tr><th>Asset</th><th>Type</th><th>Stake</th><th>P&L</th><th>Time</th></tr></thead>
+        <tbody id="positionsBody">
+          <tr><td>V100</td><td style="color:var(--green)">Rise</td><td>$10</td><td class="up" id="pnl1">+$4.20</td><td>00:42</td></tr>
+          <tr><td>V25</td><td style="color:var(--red)">Fall</td><td>$25</td><td class="down" id="pnl2">-$2.10</td><td>01:15</td></tr>
+          <tr><td>V75</td><td style="color:var(--green)">Rise</td><td>$50</td><td class="up" id="pnl3">+$12.80</td><td>02:08</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- RIGHT PANEL — AI -->
+  <div class="right-panel">
+    <div class="ai-header">
+      <span class="ai-badge">✦ AI</span>
+      <span class="ai-title">Market Analysis</span>
+    </div>
+
+    <!-- SENTIMENT -->
+    <div class="ai-card">
+      <div class="ai-card-title">🧠 Market Sentiment</div>
+      <div class="sentiment-ring">
+        <div class="ring-wrap">
+          <svg class="ring-svg" width="100" height="100" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="10"/>
+            <circle cx="50" cy="50" r="40" fill="none" stroke="url(#ringGrad)" stroke-width="10"
+              stroke-dasharray="251" stroke-dashoffset="80" stroke-linecap="round"/>
+            <defs>
+              <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#10b981"/>
+                <stop offset="100%" stop-color="#06b6d4"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="ring-center"><div class="ring-pct">68%</div><div class="ring-lbl">Bullish</div></div>
+        </div>
+      </div>
+      <div class="meter-row">
+        <div class="meter-label"><span>Bullish</span><span style="color:var(--green)">68%</span></div>
+        <div class="meter-bar"><div class="meter-fill" style="width:68%;background:linear-gradient(90deg,#059669,#10b981)"></div></div>
+      </div>
+      <div class="meter-row">
+        <div class="meter-label"><span>Bearish</span><span style="color:var(--red)">22%</span></div>
+        <div class="meter-bar"><div class="meter-fill" style="width:22%;background:linear-gradient(90deg,#dc2626,#ef4444)"></div></div>
+      </div>
+      <div class="meter-row">
+        <div class="meter-label"><span>Neutral</span><span style="color:var(--gold)">10%</span></div>
+        <div class="meter-bar"><div class="meter-fill" style="width:10%;background:linear-gradient(90deg,#d97706,#f59e0b)"></div></div>
+      </div>
+    </div>
+
+    <!-- AI SIGNALS -->
+    <div class="ai-card">
+      <div class="ai-card-title">⚡ AI Signals</div>
+      <div class="signal-row"><span class="signal-asset">V100 (1s)</span><span class="signal-badge signal-buy">BUY</span><span class="signal-conf">92%</span></div>
+      <div class="signal-row"><span class="signal-asset">V75</span><span class="signal-badge signal-buy">BUY</span><span class="signal-conf">87%</span></div>
+      <div class="signal-row"><span class="signal-asset">V50</span><span class="signal-badge signal-sell">SELL</span><span class="signal-conf">74%</span></div>
+      <div class="signal-row"><span class="signal-asset">Boom 500</span><span class="signal-badge signal-buy">BUY</span><span class="signal-conf">81%</span></div>
+      <div class="signal-row"><span class="signal-asset">Crash 500</span><span class="signal-badge signal-neutral">HOLD</span><span class="signal-conf">61%</span></div>
+      <div class="signal-row"><span class="signal-asset">V25</span><span class="signal-badge signal-sell">SELL</span><span class="signal-conf">79%</span></div>
+    </div>
+
+    <!-- VOLATILITY -->
+    <div class="ai-card">
+      <div class="ai-card-title">📊 Volatility Index</div>
+      <div class="meter-row"><div class="meter-label"><span>V10</span><span>Low</span></div><div class="meter-bar"><div class="meter-fill" style="width:18%;background:#3b82f6"></div></div></div>
+      <div class="meter-row"><div class="meter-label"><span>V25</span><span>Medium</span></div><div class="meter-bar"><div class="meter-fill" style="width:35%;background:#3b82f6"></div></div></div>
+      <div class="meter-row"><div class="meter-label"><span>V50</span><span>High</span></div><div class="meter-bar"><div class="meter-fill" style="width:58%;background:#f59e0b"></div></div></div>
+      <div class="meter-row"><div class="meter-label"><span>V75</span><span>Very High</span></div><div class="meter-bar"><div class="meter-fill" style="width:76%;background:#ef4444"></div></div></div>
+      <div class="meter-row"><div class="meter-label"><span>V100</span><span>Extreme</span></div><div class="meter-bar"><div class="meter-fill" style="width:94%;background:#ef4444"></div></div></div>
+    </div>
+
+    <!-- AI CHAT -->
+    <div class="ai-card">
+      <div class="ai-card-title">💬 Ask AI Analyst</div>
+      <div id="chatMessages">
+        <div class="ai-msg">👋 Hello! I'm your AI market analyst. Ask me anything about markets, trade setups, or risk management.</div>
+      </div>
+      <div class="ai-chat-input">
+        <input class="ai-input" id="chatInput" placeholder="Ask about markets..." onkeypress="if(event.key==='Enter')sendChat()"/>
+        <button class="ai-send" onclick="sendChat()">→</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" style="position:fixed;bottom:24px;right:24px;background:var(--blue-accent);color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;display:none;z-index:200;animation:fadeIn 0.3s ease;"></div>
+
+<script>
+// CHART
+const points = [];
+let basePrice = 9887.60;
+for(let i=0;i<80;i++){basePrice+=((Math.random()-0.48)*8);points.push(basePrice);}
+
+function drawChart(){
+  const svg = document.getElementById('chartSvg');
+  const w=800,h=180,pad=10;
+  const mn=Math.min(...points),mx=Math.max(...points);
+  const xScale=i=>(i/(points.length-1))*(w-pad*2)+pad;
+  const yScale=v=>h-pad-((v-mn)/(mx-mn))*(h-pad*2);
+  const pts=points.map((v,i)=>`${xScale(i)},${yScale(v)}`).join(' ');
+  const lastX=xScale(points.length-1),lastY=yScale(points[points.length-1]);
+  document.getElementById('chartLine').setAttribute('d',`M ${pts.split(' ').join(' L ')}`);
+  document.getElementById('chartArea').setAttribute('d',`M ${pad},${h-pad} L ${pts.split(' ').join(' L ')} L ${lastX},${h-pad} Z`);
+}
+drawChart();
+
+// LIVE PRICE UPDATE
+function updatePrices(){
+  const ids=['t1','t2','t3','t4','t5','t6','t7','t8'];
+  const bases=[977.45,1842.30,4521.80,6204.15,9887.60,2341.90,1129.75,8802.20];
+  ids.forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    const val=bases[i]+((Math.random()-0.5)*bases[i]*0.001);
+    el.textContent=val.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  });
+  // Update live chart
+  const newP=points[points.length-1]+((Math.random()-0.48)*8);
+  points.push(newP);points.shift();
+  drawChart();
+  // Update live price display
+  const lp=document.getElementById('livePrice');
+  if(lp){lp.textContent=points[points.length-1].toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  // Update P&L
+  const pnls=[document.getElementById('pnl1'),document.getElementById('pnl2'),document.getElementById('pnl3')];
+  const vals=[4.20,-2.10,12.80];
+  pnls.forEach((el,i)=>{
+    if(!el)return;
+    vals[i]+=(Math.random()-0.5)*0.3;
+    el.textContent=(vals[i]>=0?'+':'')+vals[i].toFixed(2);
+    el.className=vals[i]>=0?'up':'down';
+  });
+}
+setInterval(updatePrices,1200);
+
+// PAYOUT
+function updatePayout(){
+  const stake=parseFloat(document.getElementById('stakeInput').value)||10;
+  const payout=(stake*1.95).toFixed(2);
+  const profit=(stake*0.95).toFixed(2);
+  document.getElementById('payoutVal').textContent='$'+payout;
+  document.getElementById('profitVal').textContent='+$'+profit;
+}
+
+// DURATION
+function setDur(btn,val){
+  document.querySelectorAll('.dur-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// TRADE
+function placeTrade(dir){
+  const stake=document.getElementById('stakeInput').value||10;
+  showToast(`✅ ${dir.toUpperCase()} trade placed — $${stake} on V100`);
+  setTimeout(()=>{
+    const win=Math.random()>0.45;
+    showToast(win?`🎉 Trade WON! +$${(stake*0.95).toFixed(2)}`:`❌ Trade lost. -$${stake}`);
+  },3000);
+}
+
+// TOAST
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.display='block';
+  setTimeout(()=>t.style.display='none',3000);
+}
+
+// AUTH MODALS
+function showLogin(){showToast('🔐 Redirecting to Deriv login...');}
+function showSignup(){showToast('📝 Redirecting to Deriv signup...');}
+
+// AI CHAT
+const aiResponses = [
+  "📊 Based on current volatility patterns, V100 shows strong upward momentum. Confidence: 87%. Consider a Rise trade with 5-tick duration.",
+  "⚠️ Market conditions are mixed right now. V50 is showing bearish divergence — I'd avoid it for the next 10 minutes.",
+  "💡 Pro tip: Boom & Crash indices often move opposite to Volatility indices. Use this for hedging your positions.",
+  "📈 V75 has broken above its recent resistance. This is typically a bullish signal — probability of rise: 79%.",
+  "🎯 Best setup right now: V100 Rise with 1-tick duration. Low risk, high probability based on tick pattern analysis.",
+  "⚡ Volatility is spiking on V50 right now. High volatility = higher payouts but more risk. Reduce stake size.",
+  "🔍 I'm analyzing the last 500 ticks... V25 is in accumulation phase. Expect upward movement in next 2-5 minutes.",
+];
+let aiIdx=0;
+function sendChat(){
+  const input=document.getElementById('chatInput');
+  const msg=input.value.trim();
+  if(!msg)return;
+  const chat=document.getElementById('chatMessages');
+  chat.innerHTML+=`<div class="ai-msg user">${msg}</div>`;
+  chat.innerHTML+=`<div class="thinking"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+  input.value='';
+  chat.scrollTop=chat.scrollHeight;
+  setTimeout(()=>{
+    const thinking=chat.querySelector('.thinking');
+    if(thinking)thinking.remove();
+    const resp=aiResponses[aiIdx%aiResponses.length];aiIdx++;
+    chat.innerHTML+=`<div class="ai-msg">${resp}</div>`;
+    chat.scrollTop=chat.scrollHeight;
+  },1500);
+}
+
+// SIDEBAR CLICK
+document.querySelectorAll('.sidebar-item').forEach(item=>{
+  item.addEventListener('click',function(){
+    document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+// CHART TABS
+document.querySelectorAll('.chart-tab').forEach(tab=>{
+  tab.addEventListener('click',function(){
+    document.querySelectorAll('.chart-tab').forEach(t=>t.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
